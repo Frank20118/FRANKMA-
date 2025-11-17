@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Чат с {{ current_chat.name | e }} - Telegram Web Client{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+    <header class="chat-header">
+        <a href="{{ url_for('dashboard') }}" class="back-btn">← Назад к чатам</a>
+        <h2>{{ current_chat.name | e }}</h2>
+    </header>
+
+    <div class="chat-content">
+        <aside class="chat-sidebar">
+            <h3>💬 Диалоги</h3>
+            <div class="dialogs-list">
+                {% for dialog in dialogs %}
+                <a href="{{ url_for('chat', chat_id=dialog.id) }}" 
+                   class="dialog-item {% if dialog.id == chat_id %}active{% endif %}">
+                    <div class="dialog-icon">
+                        {% if dialog.is_user %}👤
+                        {% elif dialog.is_group %}👥
+                        {% elif dialog.is_channel %}📢
+                        {% else %}💬{% endif %}
+                    </div>
+                    <div class="dialog-info">
+                        <div class="dialog-name">{{ dialog.name | e }}</div>
+                    </div>
+                    {% if dialog.unread_count %}
+                    <div class="unread-badge">{{ dialog.unread_count }}</div>
+                    {% endif %}
+                </a>
+                {% endfor %}
+            </div>
+        </aside>
+
+        <main class="chat-main">
+            <div class="messages-container" id="messagesContainer">
+                {% for message in messages %}
+                <div class="message {% if message.out %}outgoing{% else %}incoming{% endif %}">
+                    <div class="message-content">
+                        {{ message.text | e }}
+                    </div>
+                    <div class="message-time">{{ message.date }}</div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="message-input">
+                <form id="sendMessageForm">
+                    <input type="hidden" name="chat_id" value="{{ chat_id }}">
+                    <div class="input-group">
+                        <input type="text" id="messageText" 
+                               placeholder="Введите сообщение..." required>
+                        <button type="submit" class="btn btn-primary">Отправить</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    // Функция для экранирования HTML
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Функция обновления сообщений
+    async function refreshMessages() {
+        try {
+            const response = await fetch('/api/get_messages/' + {{ chat_id }});
+            if (response.ok) {
+                const data = await response.json();
+                updateMessages(data.messages);
+            }
+        } catch (error) {
+            console.error('Error refreshing messages:', error);
+        }
+    }
+
+    // Функция обновления интерфейса сообщений
+    function updateMessages(messages) {
+        const container = document.getElementById('messagesContainer');
+        container.innerHTML = '';
+        
+        messages.forEach(function(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message ' + (message.out ? 'outgoing' : 'incoming');
+            messageDiv.innerHTML = '<div class="message-content">' + escapeHtml(message.text) + '</div><div class="message-time">' + message.date + '</div>';
+            container.appendChild(messageDiv);
+        });
+        
+        container.scrollTop = container.scrollHeight;
+    }
+
+    // Обработчик отправки формы
+    document.getElementById('sendMessageForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const text = document.getElementById('messageText').value.trim();
+        if (!text) {
+            alert('Введите сообщение');
+            return;
+        }
+
+        const formData = {
+            chat_id: {{ chat_id }},
+            text: text
+        };
+        
+        const submitBtn = document.querySelector('#sendMessageForm button');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Отправка...';
+        submitBtn.disabled = true;
+
+        try {
+            const response = await fetch('/api/send_message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            if (response.ok) {
+                document.getElementById('messageText').value = '';
+                refreshMessages();
+            } else {
+                const errorData = await response.json();
+                if (response.status === 401) {
+                    alert('Сессия истекла. Пожалуйста, войдите снова.');
+                    window.location.href = '/login';
+                } else {
+                    alert('Ошибка отправки: ' + (errorData.error || 'Неизвестная ошибка'));
+                }
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Ошибка отправки сообщения');
+        } finally {
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        }
+    });
+    
+    // Авто-скролл вниз при загрузке
+    window.addEventListener('load', function() {
+        const container = document.getElementById('messagesContainer');
+        if (container) {
+            container.scrollTop = container.scrollHeight;
+        }
+    });
+    
+    // Авто-обновление сообщений каждые 3 секунды
+    setInterval(refreshMessages, 3000);
+</script>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Панель управления - Telegram Web Client{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <header class="header">
+        <div class="user-info">
+            <h2>👋 Привет, {{ user.first_name }}!</h2>
+            <p>@{{ user.username }} • {{ user.phone }}</p>
+        </div>
+        <a href="{{ url_for('logout') }}" class="btn btn-secondary">Выйти</a>
+    </header>
+
+    <div class="content">
+        <aside class="sidebar">
+            <h3>💬 Диалоги</h3>
+            <div class="dialogs-list">
+                {% for dialog in dialogs %}
+                <a href="{{ url_for('chat', chat_id=dialog.id) }}" 
+                   class="dialog-item {% if dialog.unread_count %}unread{% endif %}">
+                    <div class="dialog-icon">
+                        {% if dialog.is_user %}👤
+                        {% elif dialog.is_group %}👥
+                        {% elif dialog.is_channel %}📢
+                        {% else %}💬{% endif %}
+                    </div>
+                    <div class="dialog-info">
+                        <div class="dialog-name">{{ dialog.name }}</div>
+                        <div class="dialog-preview">{{ dialog.last_message }}</div>
+                    </div>
+                    {% if dialog.unread_count %}
+                    <div class="unread-badge">{{ dialog.unread_count }}</div>
+                    {% endif %}
+                </a>
+                {% endfor %}
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="welcome-message">
+                <h3>🚀 Добро пожаловать в Telegram Web Client!</h3>
+                <p>Выберите диалог слева для начала общения.</p>
+                <div class="features">
+                    <div class="feature">📨 Отправка и получение сообщений</div>
+                    <div class="feature">👥 Просмотр всех диалогов</div>
+                    <div class="feature">🔐 Безопасное подключение</div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}

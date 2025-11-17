@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Web Client - Главная</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="index-container">
+        <div class="hero-section">
+            <div class="hero-content">
+                <h1>🚀 Telegram Web Client</h1>
+                <p class="hero-subtitle">Полнофункциональный клиент Telegram в вашем браузере</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🔐</div>
+                        <h3>Безопасный вход</h3>
+                        <p>Авторизация через код подтверждения и 2FA</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">💬</div>
+                        <h3>Все сообщения</h3>
+                        <p>Полная поддержка личных чатов и групп</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">📱</div>
+                        <h3>Адаптивный дизайн</h3>
+                        <p>Работает на любом устройстве</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Быстрая работа</h3>
+                        <p>Мгновенная отправка и получение сообщений</p>
+                    </div>
+                </div>
+
+                <div class="cta-section">
+                    <a href="{{ url_for('login') }}" class="btn btn-primary btn-large">
+                        🔐 Начать использование
+                    </a>
+                    
+                    <div class="stats">
+                        <div class="stat">
+                            <div class="stat-number">100%</div>
+                            <div class="stat-label">Безопасно</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">🚀</div>
+                            <div class="stat-label">Быстро</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">📱</div>
+                            <div class="stat-label">Удобно</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2>📋 Как это работает?</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Введите номер телефона</h3>
+                    <p>Используйте ваш номер Telegram аккаунта</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Получите код подтверждения</h3>
+                    <p>Код придет в официальное приложение Telegram</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Начните общение</h3>
+                    <p>Полный доступ ко всем вашим чатам и сообщениям</p>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>🔒 <strong>Ваши данные в безопасности</strong> - все соединения защищены, данные хранятся локально</p>
+            <p class="footer-note">Это неофициальный клиент Telegram. Используйте на свой страх и риск.</p>
+        </footer>
+    </div>
+</body>
+</html>
